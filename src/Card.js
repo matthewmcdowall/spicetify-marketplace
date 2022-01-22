@@ -134,8 +134,8 @@ class Card extends react.Component {
                 this.installTheme();
             }
 
-            // If the new or previous theme has JS, prompt to reload
-            if (this.include || previousTheme.include) openReloadModal();
+            // If the new or previous theme has JS, reload
+            if (this.include || previousTheme.include) location.reload();
         } else if (this.type === "snippet") {
             if (this.isInstalled()) {
                 console.log("Snippet already installed, removing");
@@ -252,6 +252,7 @@ class Card extends react.Component {
         // TODO: We'll also need to actually update the usercss etc, not just the colour scheme
         // e.g. the stuff from extension.js, like injectUserCSS() etc.
 
+        // If new theme has no JS, apply immediately
         if (!this.include) {
             // Add new theme css
             this.injectUserCSS(this.localStorageKey);
@@ -268,7 +269,7 @@ class Card extends react.Component {
         // If don't specify theme, remove the currently installed theme
         themeKey = themeKey || localStorage.getItem(LOCALSTORAGE_KEYS.themeInstalled);
 
-        const themeValue = themeKey && localStorage.getItem(themeKey);
+        const themeValue = themeKey && getLocalStorageDataFromKey(themeKey, null);
 
         if (themeValue) {
             console.log(`Removing theme ${themeKey}`);
@@ -286,13 +287,15 @@ class Card extends react.Component {
 
             console.log("Removed");
 
-
-            // Removes the current theme CSS
-            this.injectUserCSS(null);
-            // Update the active theme in Grid state
-            this.updateActiveTheme(null);
-            // Removes the current colour scheme
-            this.updateColourSchemes(null);
+            // If previous had no JS, apply immediately
+            if (!themeValue.include) {
+                // Removes the current theme CSS
+                this.injectUserCSS(null);
+                // Update the active theme in Grid state
+                this.updateActiveTheme(null);
+                // Removes the current colour scheme
+                this.updateColourSchemes(null);
+            }
 
             this.setState({ installed: false });
         }

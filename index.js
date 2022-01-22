@@ -401,10 +401,12 @@ class Grid extends react.Component {
 
         // Save to localstorage
         const installedThemeKey = localStorage.getItem(LOCALSTORAGE_KEYS.themeInstalled);
-        const installedThemeDataStr = localStorage.getItem(installedThemeKey);
-        const installedThemeData = JSON.parse(installedThemeDataStr);
-        installedThemeData.activeScheme = activeScheme;
-        localStorage.setItem(installedThemeKey, JSON.stringify(installedThemeData));
+
+        if (installedThemeKey) {
+            const installedTheme = getLocalStorageDataFromKey(installedThemeKey, null);
+            installedTheme.activeScheme = activeScheme;
+            localStorage.setItem(installedThemeKey, JSON.stringify(installedTheme));
+        }
 
         this.setState({
             schemes,
