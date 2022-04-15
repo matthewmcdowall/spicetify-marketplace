@@ -117,6 +117,7 @@ function openConfig() {
         createToggle("Tags", "tags"),
         createToggle("Hide installed in Marketplace", "hideInstalled"),
         createToggle("Shift Colors Every Minute", "colorShift"),
+        createToggle("Enable Developer Mode", "developerMode"),
         // TODO: add these features maybe?
         // createSlider("Followers count", "followers"),
         // createSlider("Post type", "type"),

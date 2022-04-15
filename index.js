@@ -106,6 +106,7 @@ const CONFIG = {
         tags: JSON.parse(localStorage.getItem("marketplace:tags")) ?? true,
         hideInstalled: JSON.parse(localStorage.getItem("marketplace:hideInstalled")) ?? false,
         colorShift: JSON.parse(localStorage.getItem("marketplace:colorShift")) ?? false,
+        developerMode: JSON.parse(localStorage.getItem("marketplace:developerMode")) ?? false,
         // Legacy from reddit app...
         type: JSON.parse(localStorage.getItem("marketplace:type")) ?? false,
         // I was considering adding watchers as "followers" but it looks like the value is a duplicate
@@ -535,6 +536,46 @@ class Grid extends react.Component {
 
             onClick: openConfig,
         }, SETTINGS_ICON),
+        react.createElement("button", {
+            className: "marketplace-css-check-button",
+            id: "marketplace-css-check-button",
+            onClick: () => {
+                const classNameList = document.querySelector("style.marketplaceCSS.marketplaceUserCSS").innerHTML;
+                const regex = /(\S+? ?\S+ |(?:\S+ > \S+)+) ?\{/gm;
+                const invalidCssClassName = [];
+                let m;
+
+                while ((m = regex.exec(classNameList)) !== null) {
+                    // This is necessary to avoid infinite loops with zero-width matches
+                    if (m.index === regex.lastIndex) {
+                        regex.lastIndex++;
+                    }
+
+                    // The result can be accessed through the `m`-variable.
+                    m.forEach((match, groupIndex) => {
+                        if (groupIndex === 1) {
+                            const className = match.trim().replace(".", "");
+                            try {
+                                const element = document.getElementsByClassName(className);
+                                if (!element[0]) {
+                                    invalidCssClassName.push(className);
+                                }
+                            } catch (e) {
+                                invalidCssClassName.push(className);
+                            }
+                        }
+                    });
+                }
+                console.log(invalidCssClassName);
+                Spicetify.PopupModal.display({
+                    title: `Invalid CSS Classes`,
+                    content: invalidCssClassName.length > 0 ? `The following CSS classes are invalid because they do not match any HTML Elements: ${invalidCssClassName.join("<br> ")}` : "No invalid CSS classes found.",
+                    isLarge: true,
+                });
+
+            },
+        },
+        ),
         // End of marketplace-header__right
         ),
             // TODO: Add search bar and sort functionality
